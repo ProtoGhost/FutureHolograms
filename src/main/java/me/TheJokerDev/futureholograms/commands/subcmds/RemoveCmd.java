@@ -1,28 +1,21 @@
 package me.TheJokerDev.futureholograms.commands.subcmds;
 
-import me.TheJokerDev.futureholograms.commands.SubCommand;
-import me.TheJokerDev.futureholograms.holo.FHologram;
-import me.TheJokerDev.futureholograms.holo.HologramsManager;
-import me.TheJokerDev.futureholograms.utils.LocationUtil;
-import me.TheJokerDev.futureholograms.utils.Utils;
-import me.TheJokerDev.other.FileConfigurationUtil;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import me.TheJokerDev.futureholograms.commands.*;
+import org.bukkit.command.*;
+import me.TheJokerDev.futureholograms.utils.*;
+import me.TheJokerDev.futureholograms.holo.*;
+import java.util.function.*;
+import java.util.stream.*;
+import org.bukkit.util.*;
+import java.util.*;
 
 public class RemoveCmd implements SubCommand {
     @Override
-    public boolean onCommand(CommandSender sender, String[] args) {
-        if (args.length == 1){
-            String var1 = args[0];
-            FHologram var2 = HologramsManager.getHologram(var1);
-            if (var2 == null){
+    public boolean onCommand(final CommandSender sender, final String[] args) {
+        if (args.length == 1) {
+            final String var1 = args[0];
+            final FHologram var2 = HologramsManager.getHologram(var1);
+            if (var2 == null) {
                 Utils.sendMessage(sender, "messages.commands.remove.notExist");
                 return true;
             }
@@ -31,18 +24,19 @@ public class RemoveCmd implements SubCommand {
             HologramsManager.hologramHashMap.remove(var1);
             Utils.sendMessage(sender, "messages.commands.remove.success");
         } else {
-            Utils.sendMessage(sender, help());
+            Utils.sendMessage(sender, this.help());
         }
         return true;
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, String[] args) {
-        if (args.length == 1){
-            String var1 = args[0];
-            List<String> list1 = Arrays.stream(HologramsManager.getHolograms()).map(FHologram::getName).collect(Collectors.toList());
-            List<String> list2 = new ArrayList<>();
-
+    public List<String> onTabComplete(final CommandSender sender, final String[] args) {
+        if (args.length == 1) {
+            final String var1 = args[0];
+            final List<String> list1 = Arrays.stream(HologramsManager.getHolograms())
+                    .map(FHologram::getName)
+                    .collect(Collectors.toList());
+            final List<String> list2 = new ArrayList<>();
             StringUtil.copyPartialMatches(var1, list1, list2);
             Collections.shuffle(list2);
             return list2;

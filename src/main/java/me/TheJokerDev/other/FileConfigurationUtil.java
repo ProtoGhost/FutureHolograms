@@ -1,321 +1,308 @@
 package me.TheJokerDev.other;
 
-import me.TheJokerDev.futureholograms.utils.Utils;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import java.nio.file.*;
+import org.bukkit.configuration.file.*;
+import java.io.*;
+import me.TheJokerDev.futureholograms.utils.*;
+import org.bukkit.configuration.*;
+import java.util.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.List;
-import java.util.Set;
-
-public class FileConfigurationUtil {
+public class FileConfigurationUtil
+{
     private FileConfiguration config;
     private final File file;
-
-    public FileConfigurationUtil(File file) {
+    
+    public FileConfigurationUtil(final File file) {
         this.file = file;
         this.load();
     }
-
-    public FileConfigurationUtil(File folder, String fileName) {
+    
+    public FileConfigurationUtil(final File folder, final String fileName) {
         this(new File(folder(folder), fileName));
     }
-
-
-    public static File folder(File folder) {
+    
+    public static File folder(final File folder) {
         if (!folder.exists()) {
             folder.mkdir();
         }
-
         return folder;
     }
-    public static boolean isSymlink(File file) throws IOException {
+    
+    public static boolean isSymlink(final File file) throws IOException {
         if (file == null) {
             throw new NullPointerException("File must not be null");
-        } else {
-            return Files.isSymbolicLink(file.toPath());
         }
+        return Files.isSymbolicLink(file.toPath());
     }
-    public static <T> T requireNonNull(T obj) {
+    
+    public static <T> T requireNonNull(final T obj) {
         if (obj == null) {
             throw new NullPointerException();
-        } else {
-            return obj;
         }
+        return obj;
     }
+    
     private void load() {
         try {
             if (!this.file.exists()) {
                 this.file.createNewFile();
             }
-
-            this.config = YamlConfiguration.loadConfiguration(this.file);
-        } catch (Exception var2) {
+            this.config = (FileConfiguration)YamlConfiguration.loadConfiguration(this.file);
+        }
+        catch (Exception var2) {
             var2.printStackTrace();
         }
-
     }
-
+    
     public void clear() {
         try {
             destroyFile(this.file);
             if (!this.file.exists()) {
                 this.file.createNewFile();
             }
-
             this.reload();
-        } catch (Exception var2) {
+        }
+        catch (Exception var2) {
             var2.printStackTrace();
         }
-
     }
-
-    public static void cleanDirectory(File directory) throws IOException {
-        File[] files = verifiedListFiles(directory);
+    
+    public static void cleanDirectory(final File directory) throws IOException {
+        final File[] files = verifiedListFiles(directory);
         IOException exception = null;
-        File[] var3 = files;
-        int var4 = files.length;
-
-        for(int var5 = 0; var5 < var4; ++var5) {
-            File file = var3[var5];
-
+        final File[] var3 = files;
+        for (int var4 = files.length, var5 = 0; var5 < var4; ++var5) {
+            final File file = var3[var5];
             try {
                 forceDelete(file);
-            } catch (IOException var8) {
-                exception = var8;
+            }
+            catch (IOException var6) {
+                exception = var6;
             }
         }
-
         if (null != exception) {
             throw exception;
         }
     }
-
-    private static File[] verifiedListFiles(File directory) throws IOException {
-        String message;
+    
+    private static File[] verifiedListFiles(final File directory) throws IOException {
         if (!directory.exists()) {
-            message = directory + " does not exist";
+            final String message = directory + " does not exist";
             throw new IllegalArgumentException(message);
-        } else if (!directory.isDirectory()) {
-            message = directory + " is not a directory";
-            throw new IllegalArgumentException(message);
-        } else {
-            File[] files = directory.listFiles();
-            if (files == null) {
-                throw new IOException("Failed to list contents of " + directory);
-            } else {
-                return files;
-            }
         }
+        if (!directory.isDirectory()) {
+            final String message = directory + " is not a directory";
+            throw new IllegalArgumentException(message);
+        }
+        final File[] files = directory.listFiles();
+        if (files == null) {
+            throw new IOException("Failed to list contents of " + directory);
+        }
+        return files;
     }
-    public static void deleteDirectory(File directory) throws IOException {
+    
+    public static void deleteDirectory(final File directory) throws IOException {
         if (directory.exists()) {
             if (!isSymlink(directory)) {
                 cleanDirectory(directory);
             }
-
             if (!directory.delete()) {
-                String message = "Unable to delete directory " + directory + ".";
+                final String message = "Unable to delete directory " + directory + ".";
                 throw new IOException(message);
             }
         }
     }
-    public static void destroyFile(File file) throws Exception {
+    
+    public static void destroyFile(final File file) throws Exception {
         forceDelete(file);
     }
-    public static void forceDelete(File file) throws IOException {
+    
+    public static void forceDelete(final File file) throws IOException {
         if (file.isDirectory()) {
             deleteDirectory(file);
-        } else {
-            boolean filePresent = file.exists();
+        }
+        else {
+            final boolean filePresent = file.exists();
             if (!file.delete()) {
                 if (!filePresent) {
                     throw new FileNotFoundException("File does not exist: " + file);
                 }
-
-                String message = "Unable to delete file: " + file;
+                final String message = "Unable to delete file: " + file;
                 throw new IOException(message);
             }
         }
-
     }
-
+    
     public void reload() {
-        this.config = YamlConfiguration.loadConfiguration(this.file);
+        this.config = (FileConfiguration)YamlConfiguration.loadConfiguration(this.file);
     }
-
+    
     public void save() {
         try {
             this.config.save(this.file);
-        } catch (Exception var2) {
+        }
+        catch (Exception var2) {
             var2.printStackTrace();
         }
-
     }
-
-    public void set(String path, Object value) {
+    
+    public void set(final String path, Object value) {
         if (value instanceof Float) {
-            float val = (Float)value;
+            final float val = (float)value;
             value = Float.toString(val);
         }
-
         this.config.set(path, value);
         this.save();
     }
-
-    public void add(String path, Object value) {
+    
+    public void add(final String path, final Object value) {
         if (!this.contains(path)) {
             this.set(path, value);
         }
-
     }
-
-    public boolean contains(String path) {
+    
+    public boolean contains(final String path) {
         return this.config.contains(path);
     }
-
-    public Object get(String path) {
+    
+    public Object get(final String path) {
         return this.config.get(path);
     }
-
-    public Object get(String path, Object def) {
+    
+    public Object get(final String path, final Object def) {
         this.add(path, def);
         return this.get(path);
     }
-
-    public String getString(String path) {
+    
+    public String getString(final String path) {
         return this.config.getString(Utils.ct(path));
     }
-
-    public String getString(String path, String def) {
+    
+    public String getString(final String path, final String def) {
         this.add(path, def);
         return this.getString(path);
     }
-
-    public boolean getBoolean(String path) {
+    
+    public boolean getBoolean(final String path) {
         return this.config.getBoolean(path);
     }
-
-    public boolean getBoolean(String path, boolean def) {
+    
+    public boolean getBoolean(final String path, final boolean def) {
         this.add(path, def);
         return this.getBoolean(path);
     }
-
-    public int getInt(String path) {
+    
+    public int getInt(final String path) {
         return this.config.getInt(path);
     }
-
-    public int getInt(String path, int def) {
+    
+    public int getInt(final String path, final int def) {
         this.add(path, def);
         return this.getInt(path);
     }
-
-    public double getDouble(String path) {
+    
+    public double getDouble(final String path) {
         return this.config.getDouble(path);
     }
-
-    public double getDouble(String path, double def) {
+    
+    public double getDouble(final String path, final double def) {
         this.add(path, def);
         return this.getDouble(path);
     }
-
-    public long getLong(String path) {
+    
+    public long getLong(final String path) {
         return this.config.getLong(path);
     }
-
-    public long getLong(String path, long def) {
+    
+    public long getLong(final String path, final long def) {
         this.add(path, def);
         return this.getLong(path);
     }
-
-    public float getFloat(String path) {
+    
+    public float getFloat(final String path) {
         return (float)Long.parseLong(this.getString(path));
     }
-
-    public float getFloat(String path, float def) {
+    
+    public float getFloat(final String path, final float def) {
         this.add(path, def);
         return this.getFloat(path);
     }
-
-    public List<?> getList(String path) {
-        return this.config.getList(path);
+    
+    public List<?> getList(final String path) {
+        return (List<?>)this.config.getList(path);
     }
-
-    public List<?> getList(String path, List<?> def) {
+    
+    public List<?> getList(final String path, final List<?> def) {
         this.add(path, def);
         return this.getList(path);
     }
-
-    public List<String> getStringList(String path) {
-        return this.config.getStringList(path);
+    
+    public List<String> getStringList(final String path) {
+        return (List<String>)this.config.getStringList(path);
     }
-
-    public List<String> getStringList(String path, List<String> def) {
+    
+    public List<String> getStringList(final String path, final List<String> def) {
         this.add(path, def);
         return this.getStringList(path);
     }
-
-    public List<Boolean> getBooleanList(String path) {
-        return this.config.getBooleanList(path);
+    
+    public List<Boolean> getBooleanList(final String path) {
+        return (List<Boolean>)this.config.getBooleanList(path);
     }
-
-    public List<Boolean> getBooleanList(String path, List<Boolean> def) {
+    
+    public List<Boolean> getBooleanList(final String path, final List<Boolean> def) {
         this.add(path, def);
         return this.getBooleanList(path);
     }
-
-    public List<Integer> getIntList(String path) {
-        return this.config.getIntegerList(path);
+    
+    public List<Integer> getIntList(final String path) {
+        return (List<Integer>)this.config.getIntegerList(path);
     }
-
-    public List<Integer> getIntList(String path, List<Integer> def) {
+    
+    public List<Integer> getIntList(final String path, final List<Integer> def) {
         this.add(path, def);
         return this.getIntList(path);
     }
-
-    public List<Double> getDoubleList(String path) {
-        return this.config.getDoubleList(path);
+    
+    public List<Double> getDoubleList(final String path) {
+        return (List<Double>)this.config.getDoubleList(path);
     }
-
-    public List<Double> getDoubleList(String path, List<Double> def) {
+    
+    public List<Double> getDoubleList(final String path, final List<Double> def) {
         this.add(path, def);
         return this.getDoubleList(path);
     }
-
-    public List<Long> getLongList(String path) {
-        return this.config.getLongList(path);
+    
+    public List<Long> getLongList(final String path) {
+        return (List<Long>)this.config.getLongList(path);
     }
-
-    public List<Long> getLongList(String path, List<Long> def) {
+    
+    public List<Long> getLongList(final String path, final List<Long> def) {
         this.add(path, def);
         return this.getLongList(path);
     }
-
-    public List<Float> getFloatList(String path) {
-        return this.config.getFloatList(path);
+    
+    public List<Float> getFloatList(final String path) {
+        return (List<Float>)this.config.getFloatList(path);
     }
-
-    public List<Float> getFloatList(String path, List<Float> def) {
+    
+    public List<Float> getFloatList(final String path, final List<Float> def) {
         this.add(path, def);
         return this.getFloatList(path);
     }
-
-    public ConfigurationSection getSection(String path) {
+    
+    public ConfigurationSection getSection(final String path) {
         return this.config.getConfigurationSection(path);
     }
-
-    public Set<String> getKeys(boolean deep) {
-        return this.config.getKeys(deep);
+    
+    public Set<String> getKeys(final boolean deep) {
+        return (Set<String>)this.config.getKeys(deep);
     }
-
+    
     public FileConfiguration getConfig() {
         return this.config;
     }
-
+    
     public File getFile() {
         return this.file;
     }

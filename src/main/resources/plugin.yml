@@ -1,5 +1,5 @@
 name: FutureHolograms
-version: ${project.version}
+version: 1.0.4.5
 main: me.TheJokerDev.futureholograms.Main
 api-version: 1.17
 depend: [ PlaceholderAPI, HolographicDisplays ]

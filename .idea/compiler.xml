@@ -9,8 +9,5 @@
         <module name="FutureHolograms" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="FutureHolograms" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

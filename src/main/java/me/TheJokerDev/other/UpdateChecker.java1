@@ -1,0 +1,80 @@
+package me.TheJokerDev.other;
+
+import org.bukkit.plugin.java.*;
+import org.bukkit.*;
+import java.net.*;
+import java.util.*;
+import org.bukkit.plugin.*;
+import java.io.*;
+
+public class UpdateChecker
+{
+    private JavaPlugin plugin;
+    private int resourceId;
+    
+    public UpdateChecker(final JavaPlugin plugin, final int resourceId) {
+        this.plugin = plugin;
+        this.resourceId = resourceId;
+    }
+    
+    public void getVersion(final Consumer<String> consumer) {
+        final URL url;
+        InputStream inputStream;
+        Scanner scanner;
+        final Throwable t2;
+        final Throwable t4;
+        Bukkit.getScheduler().runTaskAsynchronously((Plugin)this.plugin, () -> {
+            try {
+                new URL("https://api.spigotmc.org/legacy/update.php?resource=" + this.resourceId);
+                inputStream = url.openStream();
+                try {
+                    scanner = new Scanner(inputStream);
+                    try {
+                        if (scanner.hasNext()) {
+                            consumer.accept(scanner.next());
+                        }
+                    }
+                    catch (Throwable t) {
+                        throw t;
+                    }
+                    finally {
+                        if (scanner != null) {
+                            if (t2 != null) {
+                                try {
+                                    scanner.close();
+                                }
+                                catch (Throwable exception2) {
+                                    t2.addSuppressed(exception2);
+                                }
+                            }
+                            else {
+                                scanner.close();
+                            }
+                        }
+                    }
+                }
+                catch (Throwable t3) {
+                    throw t3;
+                }
+                finally {
+                    if (inputStream != null) {
+                        if (t4 != null) {
+                            try {
+                                inputStream.close();
+                            }
+                            catch (Throwable exception3) {
+                                t4.addSuppressed(exception3);
+                            }
+                        }
+                        else {
+                            inputStream.close();
+                        }
+                    }
+                }
+            }
+            catch (IOException exception) {
+                this.plugin.getLogger().info("Cannot look for updates: " + exception.getMessage());
+            }
+        });
+    }
+}
