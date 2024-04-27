@@ -3,9 +3,9 @@ version: 1.0.4.5
 main: me.TheJokerDev.futureholograms.Main
 api-version: 1.17
 depend: [ PlaceholderAPI, HolographicDisplays ]
-authors: [ TheJokerDev ]
+authors: [ TheJokerDev, ProtoGhost ]
 description: Create custom holograms with uniques options.
-website: https://github.com/TheJokerDev/FutureHolograms
+website: https://github.com/ProtoGhost/FutureHolograms
 
 commands:
   futureholograms:
