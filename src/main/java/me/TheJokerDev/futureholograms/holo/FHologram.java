@@ -19,8 +19,7 @@ import me.TheJokerDev.other.*;
 import org.bukkit.entity.*;
 import java.util.*;
 
-public class FHologram
-{
+public class FHologram {
     private final String name;
     private String defaultHologram;
     private BukkitTask updateTask;
@@ -231,46 +230,49 @@ public class FHologram
     }
 
     public void refreshPlayer(final Player p) {
-        final Hologram holo = this.holograms.get(p);
-        if (p == null || !p.isOnline()) {
-            holo.delete();
-            this.holograms.remove(p);
-            return;
-        }
-        if (holo == null) {
-            this.holograms.remove(p);
-            this.updateTask();
-        }
-        if (holo.isDeleted()) {
-            this.holograms.remove(p);
-            this.updateTask();
-        }
-        final List<String> var4 = this.getLines(p);
-        if (holo.size() > var4.size()) {
-            for (int i = holo.size() - var4.size(), i2 = 0; i2 < i; ++i2) {
-                holo.removeLine(holo.size() - 1 - 1);
+        // Ensure the method runs on the main thread
+        Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
+            final Hologram holo = this.holograms.get(p);
+            if (p == null || !p.isOnline()) {
+                holo.delete();
+                this.holograms.remove(p);
+                return;
             }
-        }
-        if (var4.size() < holo.size()) {
-            for (int i = holo.size() - var4.size(), i2 = 0; i2 < i; ++i2) {
-                holo.removeLine(holo.size() - 1 - 1);
+            if (holo == null) {
+                this.holograms.remove(p);
+                this.updateTask();
+                return;
             }
-        }
-        else {
-            for (int i = 0; i < var4.size(); ++i) {
-                if (i >= holo.size()) {
-                    if (holo.isDeleted()) {
-                        this.updateTask();
-                        break;
+            if (holo.isDeleted()) {
+                this.holograms.remove(p);
+                this.updateTask();
+                return;
+            }
+            final List<String> var4 = this.getLines(p);
+            if (holo.size() > var4.size()) {
+                for (int i = holo.size() - var4.size(), i2 = 0; i2 < i; ++i2) {
+                    holo.removeLine(holo.size() - 1 - 1);
+                }
+            }
+            if (var4.size() < holo.size()) {
+                for (int i = holo.size() - var4.size(), i2 = 0; i2 < i; ++i2) {
+                    holo.removeLine(holo.size() - 1 - 1);
+                }
+            } else {
+                for (int i = 0; i < var4.size(); ++i) {
+                    if (i >= holo.size()) {
+                        if (holo.isDeleted()) {
+                            this.updateTask();
+                            break;
+                        }
+                        holo.insertTextLine(i, Utils.ct(PlaceholderAPI.setPlaceholders(p, (String)var4.get(i))));
+                    } else {
+                        final TextLine textLine = (TextLine)holo.getLine(i);
+                        textLine.setText(Utils.ct(PlaceholderAPI.setPlaceholders(p, (String)var4.get(i))));
                     }
-                    holo.insertTextLine(i, Utils.ct(PlaceholderAPI.setPlaceholders(p, (String)var4.get(i))));
-                }
-                else {
-                    final TextLine textLine = (TextLine)holo.getLine(i);
-                    textLine.setText(Utils.ct(PlaceholderAPI.setPlaceholders(p, (String)var4.get(i))));
                 }
             }
-        }
+        });
     }
 
     private void updateTouchLine(final Hologram holo, final Player p) {
@@ -284,8 +286,7 @@ public class FHologram
                 final TouchHandler touchHandler = player -> this.onClick(p);
                 lastLine.setTouchHandler(touchHandler);
             }
-        }
-        else {
+        } else {
             final TouchableLine lastLine2 = (TouchableLine)holo.getLine(this.getTouchLine(p, holo, this.getLines(p)));
             final TouchHandler touchHandler2 = player -> this.onClick(p);
             lastLine2.setTouchHandler(touchHandler2);
@@ -308,8 +309,7 @@ public class FHologram
         this.updateTouchLine(this.holograms.get(p), p);
         if (p.isSneaking() && this.hasBack(p)) {
             this.setBack(p);
-        }
-        else {
+        } else {
             this.setNext(p);
         }
         this.refreshPlayer(p);
@@ -336,28 +336,22 @@ public class FHologram
                 return lastLine;
             }
             return i;
-        }
-        else {
+        } else {
             final String lowerCase = var1.toLowerCase();
             switch (lowerCase) {
-                case "top": {
+                case "top":
                     return 0;
-                }
-                case "middle": {
+                case "middle":
                     if (lines.size() == 0) {
                         return 0;
                     }
                     return lines.size() / 2;
-                }
-                case "bottom": {
+                case "bottom":
                     return lastLine;
-                }
-                case "all": {
+                case "all":
                     return 999;
-                }
-                default: {
+                default:
                     return lastLine;
-                }
             }
         }
     }
@@ -373,20 +367,15 @@ public class FHologram
                 s = PlaceholderAPI.setPlaceholders(p, s);
                 if (isConsole) {
                     Bukkit.dispatchCommand((CommandSender)Bukkit.getConsoleSender(), s);
-                }
-                else {
+                } else {
                     p.chat("/" + s);
                 }
-            }
-            else if (isMessage) {
+            } else if (isMessage) {
                 s = s.replace("[message]", "");
                 s = PlaceholderAPI.setPlaceholders(p, s);
                 Utils.sendMessage((CommandSender)p, s);
-            }
-            else {
-                if (!isSound) {
-                    continue;
-                }
+            } else {
+                if (!isSound) continue;
                 s = s.replace("[sound]", "");
                 float volume = 1.0f;
                 float pitch = 1.0f;
@@ -396,8 +385,7 @@ public class FHologram
                     sound = XSound.valueOf(var1[0]);
                     volume = Float.parseFloat(var1[1]);
                     pitch = Float.parseFloat(var1[2]);
-                }
-                else {
+                } else {
                     sound = XSound.valueOf(s.toUpperCase());
                 }
                 sound.play((Entity)p, volume, pitch);
