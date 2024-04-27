@@ -5,7 +5,6 @@ import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
 import com.gmail.filoghost.holographicdisplays.api.handler.TouchHandler;
 import me.TheJokerDev.futureholograms.utils.*;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.gmail.filoghost.holographicdisplays.api.line.TouchableLine;
 import org.bukkit.*;
@@ -16,10 +15,8 @@ import org.bukkit.plugin.*;
 import org.bukkit.command.*;
 import org.bukkit.configuration.*;
 import me.clip.placeholderapi.*;
-
 import me.TheJokerDev.other.*;
 import org.bukkit.entity.*;
-import java.util.function.*;
 import java.util.*;
 
 public class FHologram
